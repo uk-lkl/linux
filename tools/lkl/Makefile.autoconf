@@ -53,10 +53,10 @@ endef
 define posix_host
   $(call set_autoconf_var,POSIX,y)
   $(call set_autoconf_var,VIRTIO_NET,y)
-  LDFLAGS += -pie -pthread
+  LDFLAGS += -pie
   CFLAGS += -fPIC
   SOSUF := .so
-  $(if $(call is_defined,__ANDROID__),$(call android_host),LDLIBS += -lrt -lpthread)
+  $(if $(call is_defined,__ANDROID__),$(call android_host),LDLIBS += -lrt)
   $(if $(filter $(1),elf64-x86-64-freebsd),$(call bsd_host))
   $(if $(call is_defined,__FIBER__),$(call fiber_host))
   $(if $(filter yes,$(dpdk)),$(call virtio_net_dpdk))
