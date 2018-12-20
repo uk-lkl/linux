@@ -1,8 +1,13 @@
+#include <lk/sys/types.h>
+#include <lk/arch/x86.h>
+#include <lk/arch/fpu.h>
 #include <lk/kernel/thread.h>
 #include <lk/kernel/timer.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+
+#define ROUNDDOWN(a, b) ((a) & ~((b)-1))
 
 struct thread *_current_thread = NULL;
 int ints_enabled = 0;
@@ -22,23 +27,28 @@ static void initial_thread_func(void)
 }
 
 void arch_thread_initialize(struct thread* t) {
-    // init context
-    getcontext(&t->arch.context);
+    vaddr_t stack_top = (vaddr_t)t->stack + t->stack_size;
 
-    // set stack
-    t->arch.context.uc_stack.ss_sp = t->stack;
-    t->arch.context.uc_stack.ss_size = t->stack_size;
-    t->arch.context.uc_stack.ss_flags = 0;
+    stack_top = ROUNDDOWN(stack_top, 16);
 
-    // disable return
-    t->arch.context.uc_link = NULL;
+    stack_top -= 8;
+    struct x86_64_context_switch_frame *frame = (struct x86_64_context_switch_frame *)(stack_top);
 
-    // set entrypoint
-    makecontext(&t->arch.context, initial_thread_func, 0);
+    frame--;
+    memset(frame, 0, sizeof(*frame));
+
+    frame->rip = (vaddr_t)&initial_thread_func;
+    frame->rflags = 0x3002;
+
+    fpu_init_thread_states(t);
+
+    t->arch.sp = (vaddr_t)frame;
 }
 
 void arch_context_switch(struct thread *oldthread, struct thread *newthread) {
-    swapcontext(&oldthread->arch.context, &newthread->arch.context);
+    fpu_context_switch(oldthread, newthread);
+
+    x86_64_context_switch(&oldthread->arch.sp, newthread->arch.sp);
 }
 
 void arch_idle(void) {
@@ -46,7 +56,6 @@ void arch_idle(void) {
 }
 
 void arch_dump_thread(thread_t *t) {
-
 }
 
 #if 0

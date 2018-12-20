@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2014 Travis Geiselbrecht
+ * Copyright (c) 2015 Travis Geiselbrecht
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files
@@ -20,19 +20,29 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef __LK_ARCH_ARCHTHREAD_H
-#define __LK_ARCH_ARCHTHREAD_H
 
-#include <lk/sys/types.h>
+/* void x86_64_context_switch(uint64_t *oldsp, uint64_t newsp) */
+.global x86_64_context_switch;
+.type x86_64_context_switch,STT_FUNC;
+x86_64_context_switch:
+    /* save the old context and restore the new */
+    pushf
+    pushq %rbx
+    pushq %rbp
+    pushq %r12
+    pushq %r13
+    pushq %r14
+    pushq %r15
 
-#define ARCH_DEFAULT_STACK_SIZE 4096
-#define SMP_MAX_CPUS 1
+    movq %rsp,(%rdi)
+    movq %rsi,%rsp
 
-struct arch_thread {
-    vaddr_t sp;
-    vaddr_t *fpu_states;
-    uint8_t fpu_buffer[512 + 16];
-};
+    popq %r15
+    popq %r14
+    popq %r13
+    popq %r12
+    popq %rbp
+    popq %rbx
+    popf
 
-#endif
-
+    retq
