@@ -38,4 +38,6 @@ struct x86_64_context_switch_frame {
 
 void x86_64_context_switch(vaddr_t *oldsp, vaddr_t newsp);
 
+typedef unsigned long __jmp_buf[8];
+
 #endif
