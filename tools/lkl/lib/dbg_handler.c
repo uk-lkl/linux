@@ -23,6 +23,7 @@ void dbg_handler(int signum) {
 }
 
 #ifndef __MINGW32__
+#if 0
 #include <signal.h>
 void lkl_register_dbg_handler() {
 	struct sigaction sa;
@@ -31,6 +32,10 @@ void lkl_register_dbg_handler() {
 	if (sigaction(SIGTSTP, &sa, NULL) == -1) {
 		perror("sigaction");
 	}
+}
+#endif
+void lkl_register_dbg_handler() {
+	fprintf(stderr, "lkl_register_dbg_handler is not implemented.\n");
 }
 #else
 void lkl_register_dbg_handler() {

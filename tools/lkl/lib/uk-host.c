@@ -630,17 +630,23 @@ static int blk_request(struct lkl_disk disk, struct lkl_blk_req *req)
 
 	switch (req->type) {
 	case LKL_DEV_BLK_TYPE_READ:
+#if 0
 		err = do_rw(pread, disk, req);
+#endif
 		break;
 	case LKL_DEV_BLK_TYPE_WRITE:
+#if 0
 		err = do_rw(pwrite, disk, req);
+#endif
 		break;
 	case LKL_DEV_BLK_TYPE_FLUSH:
 	case LKL_DEV_BLK_TYPE_FLUSH_OUT:
 #ifdef __linux__
 		err = fdatasync(disk.fd);
 #else
+#if 0
 		err = fsync(disk.fd);
+#endif
 #endif
 		break;
 	default:
