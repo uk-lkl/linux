@@ -16,6 +16,8 @@
 #define htobe16(x) htons(x)
 #define be32toh(x) ntohl(x)
 #define be16toh(x) ntohs(x)
+#elif defined(__FIBER__)
+#include <lk/sys/endian.h>
 #else
 #include <endian.h>
 #endif
