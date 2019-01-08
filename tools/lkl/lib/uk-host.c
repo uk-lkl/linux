@@ -403,6 +403,7 @@ static int lkl_thread_equal(lkl_thread_t a, lkl_thread_t b)
 static struct lkl_tls_key *tls_alloc(void (*destructor)(void *))
 {
 	struct lkl_tls_key *ret = malloc(sizeof(struct lkl_tls_key));
+        memset(ret, 0, sizeof(struct lkl_tls_key));
 #ifdef __FIBER__
         get_current_thread()->tls[ret->key] = (uintptr_t)ret;
 #else
