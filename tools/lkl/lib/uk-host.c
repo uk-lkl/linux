@@ -3,10 +3,17 @@
 #include <lk/kernel/thread.h>
 #include <lk/kernel/event.h>
 #include <lk/kernel/timer.h>
+#ifdef __KVM__
 #include <uk/plat/irq.h>
+#endif
 
 #include <stdlib.h>
 #include <sys/time.h>
+#ifdef __LINUXU__
+#include <linuxu/time.h>
+#include <linuxu/signal.h>
+#include <linuxu/syscall.h>
+#endif
 #include <assert.h>
 #include <unistd.h>
 #include <errno.h>
@@ -135,6 +142,12 @@ static void lkl_mutex_free(struct lkl_mutex *_mutex)
  * Most of the code comes from
  * http://linux-biyori.sakura.ne.jp/program/pr_signal02.php
  */
+#ifdef __LINUXU__
+static struct uk_sigaction sigact;
+static struct uk_sigevent sigevp;
+static struct k_itimerspec ispec;
+static k_timer_t timerid = 0;
+#endif
 static volatile lk_time_t ticks = 0;
 
 static void lkl_timer_callback(void *arg __unused)
@@ -162,7 +175,31 @@ void lkl_thread_init(void)
         thread_create_idle();
         thread_set_priority(DEFAULT_PRIORITY);
 
+#ifdef __LINUXU__
+        ukplat_irq_register(TIMER_SIGNUM, lkl_timer_callback, NULL);
+
+        memset(&sigevp, 0, sizeof(sigevp));
+        sigevp.sigev_notify = 0;
+        sigevp.sigev_signo = TIMER_SIGNUM;
+        sigevp.sigev_value.sival_ptr = &timerid;
+        if (sys_timer_create(CLOCK_REALTIME, &sigevp, &timerid) < 0) {
+                perror("timer_create error");
+                exit(1);
+        }
+
+        ispec.it_interval.tv_sec = 0;
+        ispec.it_interval.tv_nsec = 10000000;
+        ispec.it_value.tv_sec = 0;
+        ispec.it_value.tv_nsec = 0;
+        if (sys_timer_settime(timerid, 0, &ispec, NULL) < 0) {
+                perror("timer_settime error");
+                exit(1);
+        }
+#elif __KVM__
         ukplat_irq_register(0, lkl_timer_callback, NULL);
+#else
+#error Platform must be Linux user space or KVM
+#endif
 }
 
 static lkl_thread_t lkl_thread_create(void (*fn)(void *), void *arg)
