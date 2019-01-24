@@ -1,15 +1,16 @@
+#include <uk/config.h>
 #include <lk/kernel/semaphore.h>
 #include <lk/kernel/mutex.h>
 #include <lk/kernel/thread.h>
 #include <lk/kernel/event.h>
 #include <lk/kernel/timer.h>
-#ifdef __KVM__
+#ifdef CONFIG_PLAT_KVM
 #include <uk/plat/irq.h>
 #endif
 
 #include <stdlib.h>
 #include <sys/time.h>
-#ifdef __LINUXU__
+#ifdef CONFIG_PLAT_LINUXU
 #include <linuxu/time.h>
 #include <linuxu/signal.h>
 #include <linuxu/syscall.h>
@@ -142,7 +143,7 @@ static void lkl_mutex_free(struct lkl_mutex *_mutex)
  * Most of the code comes from
  * http://linux-biyori.sakura.ne.jp/program/pr_signal02.php
  */
-#ifdef __LINUXU__
+#ifdef CONFIG_PLAT_LINUXU
 static struct uk_sigaction sigact;
 static struct uk_sigevent sigevp;
 static struct k_itimerspec ispec;
@@ -175,7 +176,7 @@ void lkl_thread_init(void)
         thread_create_idle();
         thread_set_priority(DEFAULT_PRIORITY);
 
-#ifdef __LINUXU__
+#ifdef CONFIG_PLAT_LINUXU
         ukplat_irq_register(TIMER_SIGNUM, lkl_timer_callback, NULL);
 
         memset(&sigevp, 0, sizeof(sigevp));
@@ -195,7 +196,7 @@ void lkl_thread_init(void)
                 perror("timer_settime error");
                 exit(1);
         }
-#elif __KVM__
+#elif CONFIG_PLAT_KVM
         ukplat_irq_register(0, lkl_timer_callback, NULL);
 #else
 #error Platform must be Linux user space or KVM
