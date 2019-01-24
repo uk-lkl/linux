@@ -144,7 +144,6 @@ static void lkl_mutex_free(struct lkl_mutex *_mutex)
  * http://linux-biyori.sakura.ne.jp/program/pr_signal02.php
  */
 #ifdef CONFIG_PLAT_LINUXU
-static struct uk_sigaction sigact;
 static struct uk_sigevent sigevp;
 static struct k_itimerspec ispec;
 static k_timer_t timerid = 0;
