@@ -25,9 +25,7 @@
 #include <lkl/linux/socket.h>		/* for "struct lkl_sockaddr" et al	*/
 		/* for "__lkl__user" et al           */
 
-#if 0
 #include <sys/socket.h>			/* for struct lkl_sockaddr.		*/
-#endif
 
 #if __LKL__UAPI_DEF_IF_IFNAMSIZ
 #define	LKL_IFNAMSIZ	16

@@ -143,6 +143,8 @@ enum lkl_perf_event_sample_format {
 	LKL_PERF_SAMPLE_PHYS_ADDR			= 1U << 19,
 
 	LKL_PERF_SAMPLE_MAX = 1U << 20,		/* non-ABI */
+
+	__LKL__PERF_SAMPLE_CALLCHAIN_EARLY		= 1ULL << 63, /* non-ABI; internal use */
 };
 
 /*

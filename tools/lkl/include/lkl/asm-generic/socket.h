@@ -107,4 +107,7 @@
 
 #define LKL_SO_ZEROCOPY		60
 
+#define LKL_SO_TXTIME		61
+#define LKL_SCM_TXTIME		LKL_SO_TXTIME
+
 #endif /* __LKL__ASM_GENERIC_SOCKET_H */

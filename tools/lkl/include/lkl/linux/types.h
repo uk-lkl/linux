@@ -44,11 +44,7 @@ typedef __lkl__u32 __lkl__bitwise __lkl__wsum;
 #define __lkl__aligned_be64 __lkl__be64 __attribute__((aligned(8)))
 #define __lkl__aligned_le64 __lkl__le64 __attribute__((aligned(8)))
 
-#ifdef __CHECK_POLL
 typedef unsigned __lkl__bitwise __lkl__poll_t;
-#else
-typedef unsigned __lkl__poll_t;
-#endif
 
 #endif /*  __ASSEMBLY__ */
 #endif /* _LKL_LINUX_TYPES_H */

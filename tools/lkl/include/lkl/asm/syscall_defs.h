@@ -560,7 +560,7 @@ LKL_SYSCALL_DEFINE2(_lremovexattr,const char *,pathname,const char *,name)
 LKL_SYSCALL_DEFINE2(_fremovexattr,int,fd,const char *,name)
 #endif
 #ifdef __lkl__NR_vmsplice
-LKL_SYSCALL_DEFINE4(_vmsplice,int,fd,const struct lkl_iovec *,iov,unsigned long,nr_segs,unsigned int,flags)
+LKL_SYSCALL_DEFINE4(_vmsplice,int,fd,const struct lkl_iovec *,uiov,unsigned long,nr_segs,unsigned int,flags)
 #endif
 #ifdef __lkl__NR_splice
 LKL_SYSCALL_DEFINE6(_splice,int,fd_in,lkl_loff_t *,off_in,int,fd_out,lkl_loff_t *,off_out,lkl_size_t,len,unsigned int,flags)

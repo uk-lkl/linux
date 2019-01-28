@@ -45,11 +45,14 @@
 /* We've given up on this device. */
 #define LKL_VIRTIO_CONFIG_S_FAILED		0x80
 
-/* Some virtio feature bits (currently bits 28 through 32) are reserved for the
- * transport being used (eg. virtio_ring), the rest are per-device feature
- * bits. */
+/*
+ * Virtio feature bits LKL_VIRTIO_TRANSPORT_F_START through
+ * LKL_VIRTIO_TRANSPORT_F_END are reserved for the transport
+ * being used (e.g. virtio_ring, virtio_pci etc.), the
+ * rest are per-device feature bits.
+ */
 #define LKL_VIRTIO_TRANSPORT_F_START	28
-#define LKL_VIRTIO_TRANSPORT_F_END		34
+#define LKL_VIRTIO_TRANSPORT_F_END		38
 
 #ifndef VIRTIO_CONFIG_NO_LEGACY
 /* Do we get callbacks when the ring is completely used, even if we've
@@ -71,4 +74,9 @@
  * this is for compatibility with legacy systems.
  */
 #define LKL_VIRTIO_F_IOMMU_PLATFORM		33
+
+/*
+ * Does the device support Single Root I/O Virtualization?
+ */
+#define LKL_VIRTIO_F_SR_IOV			37
 #endif /* _LKL_LINUX_VIRTIO_CONFIG_H */

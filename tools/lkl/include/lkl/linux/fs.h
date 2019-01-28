@@ -242,6 +242,8 @@ struct lkl_fsxattr {
 #define LKL_FICLONERANGE	_LKL_IOW(0x94, 13, struct lkl_file_clone_range)
 #define LKL_FIDEDUPERANGE	_LKL_IOWR(0x94, 54, struct lkl_file_dedupe_range)
 
+#define LKL_FSLABEL_MAX 256	/* Max chars for the interface; each fs may differ */
+
 #define	LKL_FS_IOC_GETFLAGS			_LKL_IOR('f', 1, long)
 #define	LKL_FS_IOC_SETFLAGS			_LKL_IOW('f', 2, long)
 #define	LKL_FS_IOC_GETVERSION		_LKL_IOR('v', 1, long)
@@ -251,8 +253,10 @@ struct lkl_fsxattr {
 #define LKL_FS_IOC32_SETFLAGS		_LKL_IOW('f', 2, int)
 #define LKL_FS_IOC32_GETVERSION		_LKL_IOR('v', 1, int)
 #define LKL_FS_IOC32_SETVERSION		_LKL_IOW('v', 2, int)
-#define LKL_FS_IOC_FSGETXATTR		_LKL_IOR ('X', 31, struct lkl_fsxattr)
-#define LKL_FS_IOC_FSSETXATTR		_LKL_IOW ('X', 32, struct lkl_fsxattr)
+#define LKL_FS_IOC_FSGETXATTR		_LKL_IOR('X', 31, struct lkl_fsxattr)
+#define LKL_FS_IOC_FSSETXATTR		_LKL_IOW('X', 32, struct lkl_fsxattr)
+#define LKL_FS_IOC_GETFSLABEL		_LKL_IOR(0x94, 49, char[LKL_FSLABEL_MAX])
+#define LKL_FS_IOC_SETFSLABEL		_LKL_IOW(0x94, 50, char[LKL_FSLABEL_MAX])
 
 /*
  * File system encryption support
@@ -275,6 +279,8 @@ struct lkl_fsxattr {
 #define LKL_FS_ENCRYPTION_MODE_AES_256_CTS		4
 #define LKL_FS_ENCRYPTION_MODE_AES_128_CBC		5
 #define LKL_FS_ENCRYPTION_MODE_AES_128_CTS		6
+#define LKL_FS_ENCRYPTION_MODE_SPECK128_256_XTS	7
+#define LKL_FS_ENCRYPTION_MODE_SPECK128_256_CTS	8
 
 struct lkl_fscrypt_policy {
 	__lkl__u8 version;

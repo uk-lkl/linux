@@ -19,42 +19,41 @@
  *
  *
  * Pad space is left for:
- * - 64-bit lkl_time_t to solve y2038 problem
  * - 2 miscellaneous 32-bit values
  */
 
 struct lkl_shmid64_ds {
 	struct lkl_ipc64_perm	shm_perm;	/* operation perms */
 	lkl_size_t			shm_segsz;	/* size of segment (bytes) */
+#if __LKL__BITS_PER_LONG == 64
 	__lkl__kernel_time_t		shm_atime;	/* last attach time */
-#if __LKL__BITS_PER_LONG != 64
-	unsigned long		__unused1;
-#endif
 	__lkl__kernel_time_t		shm_dtime;	/* last detach time */
-#if __LKL__BITS_PER_LONG != 64
-	unsigned long		__unused2;
-#endif
 	__lkl__kernel_time_t		shm_ctime;	/* last change time */
-#if __LKL__BITS_PER_LONG != 64
-	unsigned long		__unused3;
+#else
+	unsigned long		shm_atime;	/* last attach time */
+	unsigned long		shm_atime_high;
+	unsigned long		shm_dtime;	/* last detach time */
+	unsigned long		shm_dtime_high;
+	unsigned long		shm_ctime;	/* last change time */
+	unsigned long		shm_ctime_high;
 #endif
 	__lkl__kernel_pid_t		shm_cpid;	/* pid of creator */
 	__lkl__kernel_pid_t		shm_lpid;	/* pid of last operator */
-	__lkl__kernel_ulong_t	shm_nattch;	/* no. of current attaches */
-	__lkl__kernel_ulong_t	__unused4;
-	__lkl__kernel_ulong_t	__unused5;
+	unsigned long		shm_nattch;	/* no. of current attaches */
+	unsigned long		__unused4;
+	unsigned long		__unused5;
 };
 
 struct lkl_shminfo64 {
-	__lkl__kernel_ulong_t	shmmax;
-	__lkl__kernel_ulong_t	shmmin;
-	__lkl__kernel_ulong_t	shmmni;
-	__lkl__kernel_ulong_t	shmseg;
-	__lkl__kernel_ulong_t	shmall;
-	__lkl__kernel_ulong_t	__unused1;
-	__lkl__kernel_ulong_t	__unused2;
-	__lkl__kernel_ulong_t	__unused3;
-	__lkl__kernel_ulong_t	__unused4;
+	unsigned long		shmmax;
+	unsigned long		shmmin;
+	unsigned long		shmmni;
+	unsigned long		shmseg;
+	unsigned long		shmall;
+	unsigned long		__unused1;
+	unsigned long		__unused2;
+	unsigned long		__unused3;
+	unsigned long		__unused4;
 };
 
 #endif /* __LKL__ASM_GENERIC_SHMBUF_H */

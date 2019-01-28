@@ -732,9 +732,13 @@ __LKL__SYSCALL(__lkl__NR_pkey_alloc,    sys_pkey_alloc)
 __LKL__SYSCALL(__lkl__NR_pkey_free,     sys_pkey_free)
 #define __lkl__NR_statx 291
 __LKL__SYSCALL(__lkl__NR_statx,     sys_statx)
+#define __lkl__NR_io_pgetevents 292
+__LKL__SC_COMP(__lkl__NR_io_pgetevents, sys_io_pgetevents, compat_sys_io_pgetevents)
+#define __lkl__NR_rseq 293
+__LKL__SYSCALL(__lkl__NR_rseq, sys_rseq)
 
 #undef __lkl__NR_syscalls
-#define __lkl__NR_syscalls 292
+#define __lkl__NR_syscalls 294
 
 /*
  * 32 bit systems traditionally used different

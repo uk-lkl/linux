@@ -33,6 +33,7 @@ enum {
 	LKL_IFA_CACHEINFO,
 	LKL_IFA_MULTICAST,
 	LKL_IFA_FLAGS,
+	LKL_IFA_RT_PRIORITY,  /* lkl_u32, priority/metric for prefix route */
 	__LKL__IFA_MAX,
 };
 

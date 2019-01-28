@@ -150,6 +150,13 @@ enum {
 	LKL_RTM_NEWCACHEREPORT = 96,
 #define LKL_RTM_NEWCACHEREPORT LKL_RTM_NEWCACHEREPORT
 
+	LKL_RTM_NEWCHAIN = 100,
+#define LKL_RTM_NEWCHAIN LKL_RTM_NEWCHAIN
+	LKL_RTM_DELCHAIN,
+#define LKL_RTM_DELCHAIN LKL_RTM_DELCHAIN
+	LKL_RTM_GETCHAIN,
+#define LKL_RTM_GETCHAIN LKL_RTM_GETCHAIN
+
 	__LKL__RTM_MAX,
 #define LKL_RTM_MAX		(((__LKL__RTM_MAX + 3) & ~3) - 1)
 };
@@ -254,6 +261,11 @@ enum {
 #define LKL_RTPROT_DHCP	16      /* DHCP client */
 #define LKL_RTPROT_MROUTED	17      /* Multicast daemon */
 #define LKL_RTPROT_BABEL	42      /* Babel daemon */
+#define LKL_RTPROT_BGP	186     /* BGP Routes */
+#define LKL_RTPROT_ISIS	187     /* ISIS Routes */
+#define LKL_RTPROT_OSPF	188     /* OSPF Routes */
+#define LKL_RTPROT_RIP	189     /* RIP Routes */
+#define LKL_RTPROT_EIGRP	192     /* EIGRP Routes */
 
 /* rtm_scope
 
@@ -327,6 +339,9 @@ enum lkl_rtattr_type_t {
 	LKL_RTA_PAD,
 	LKL_RTA_UID,
 	LKL_RTA_TTL_PROPAGATE,
+	LKL_RTA_IP_PROTO,
+	LKL_RTA_SPORT,
+	LKL_RTA_DPORT,
 	__LKL__RTA_MAX
 };
 

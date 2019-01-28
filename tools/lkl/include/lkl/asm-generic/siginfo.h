@@ -249,7 +249,8 @@ typedef struct lkl_siginfo {
 #define LKL_TRAP_TRACE	2	/* process trace trap */
 #define LKL_TRAP_BRANCH     3	/* process taken branch trap */
 #define LKL_TRAP_HWBKPT     4	/* hardware breakpoint/watchpoint */
-#define LKL_NSIGTRAP	4
+#define LKL_TRAP_UNK	5	/* undiagnosed trap */
+#define LKL_NSIGTRAP	5
 
 /*
  * There is an additional set of LKL_SIGTRAP si_codes used by ptrace

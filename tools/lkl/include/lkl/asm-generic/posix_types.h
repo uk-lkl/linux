@@ -87,6 +87,7 @@ typedef struct {
 typedef __lkl__kernel_long_t	__lkl__kernel_off_t;
 typedef long long	__lkl__kernel_loff_t;
 typedef __lkl__kernel_long_t	__lkl__kernel_time_t;
+typedef long long __lkl__kernel_time64_t;
 typedef __lkl__kernel_long_t	__lkl__kernel_clock_t;
 typedef int		__lkl__kernel_timer_t;
 typedef int		__lkl__kernel_clockid_t;
