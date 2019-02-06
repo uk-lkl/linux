@@ -28,6 +28,7 @@ struct iovec {
 };
 #endif
 
+void lkl_timer_callback(void *);
 void lkl_thread_init(void);
 
 extern struct lkl_dev_blk_ops lkl_dev_blk_ops;
