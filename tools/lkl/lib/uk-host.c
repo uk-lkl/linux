@@ -1,5 +1,6 @@
 #include <uk/config.h>
 #include <uk/plat/time.h>
+#include <timer.h>
 #include <lk/kernel/semaphore.h>
 #include <lk/kernel/mutex.h>
 #include <lk/kernel/thread.h>
@@ -158,6 +159,7 @@ void lkl_thread_init(void)
         timer_init();
         thread_create_idle();
         thread_set_priority(DEFAULT_PRIORITY);
+        ukplat_timer_callback_register(lkl_timer_callback, NULL);
 }
 
 static lkl_thread_t lkl_thread_create(void (*fn)(void *), void *arg)
