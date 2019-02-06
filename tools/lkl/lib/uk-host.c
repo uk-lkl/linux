@@ -149,6 +149,8 @@ static struct k_itimerspec ispec;
 static k_timer_t timerid = 0;
 #endif
 static volatile lk_time_t ticks = 0;
+#define LK_INTERVAL 10
+#define LK_SEC (1000 * 1000 * 1000)
 
 static void lkl_timer_callback(void *arg __unused)
 {
@@ -187,8 +189,9 @@ void lkl_thread_init(void)
                 exit(1);
         }
 
-        ispec.it_interval.tv_sec = 0;
-        ispec.it_interval.tv_nsec = 10000000;
+        memset(&ispec, 0, sizeof(ispec));
+        ispec.it_interval.tv_sec = LK_INTERVAL / LK_SEC;
+        ispec.it_interval.tv_nsec = LK_INTERVAL % LK_SEC;;
         ispec.it_value.tv_sec = 0;
         ispec.it_value.tv_nsec = 0;
         if (sys_timer_settime(timerid, 0, &ispec, NULL) < 0) {
