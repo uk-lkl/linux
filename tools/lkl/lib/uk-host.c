@@ -143,12 +143,12 @@ static void lkl_timer_callback(void *arg __unused)
 
 lk_time_t current_time(void)
 {
-        return ticks;
+        return ukplat_monotonic_clock();
 }
 
 lk_bigtime_t current_time_hires(void)
 {
-        return (lk_bigtime_t)ticks * 1000;
+        return (lk_bigtime_t)ukplat_monotonic_clock() * 1000;
 }
 
 void lkl_thread_init(void)
