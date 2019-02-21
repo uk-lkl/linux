@@ -1,6 +1,5 @@
 #include <uk/config.h>
 #include <uk/plat/time.h>
-#include <timer.h>
 #include <lk/kernel/semaphore.h>
 #include <lk/kernel/mutex.h>
 #include <lk/kernel/thread.h>
@@ -135,7 +134,7 @@ static void lkl_mutex_free(struct lkl_mutex *_mutex)
 
 static volatile lk_time_t ticks = 0;
 
-void lkl_timer_callback(void *arg __unused)
+static void lkl_timer_callback(void *arg __unused)
 {
         ticks += UKPLAT_TIME_TICK_NSEC;
         if (thread_timer_tick()==INT_RESCHEDULE)
