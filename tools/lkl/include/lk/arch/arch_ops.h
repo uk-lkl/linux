@@ -22,24 +22,25 @@
  */
 #pragma once
 
+#include <uk/plat/lcpu.h>
+
 __BEGIN_CDECLS;
 
-extern int ints_enabled;
 extern int fiqs_enabled;
 
 static inline void arch_enable_ints(void)
 {
-    ints_enabled = 1;
+    ukplat_lcpu_enable_irq();
 }
 
 static inline void arch_disable_ints(void)
 {
-    ints_enabled = 0;
+    ukplat_lcpu_disable_irq();
 }
 
 static inline bool arch_ints_disabled(void)
 {
-    return !ints_enabled;
+    return (bool)ukplat_lcpu_irqs_disabled();
 }
 
 static inline void arch_enable_fiqs(void)
