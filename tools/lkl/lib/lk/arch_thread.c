@@ -5,7 +5,6 @@
 #include <lk/kernel/timer.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 
 #define ROUNDDOWN(a, b) ((a) & ~((b)-1))
 

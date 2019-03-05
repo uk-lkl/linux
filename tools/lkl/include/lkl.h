@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+#include <sys/types.h>
+
 #define _LKL_LIBC_COMPAT_H
 
 #ifdef __cplusplus

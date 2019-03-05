@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include <uk/plat/bootstrap.h>
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -18,7 +19,7 @@ void _panic(void *caller, const char *fmt, ...)
     vprintf(fmt, ap);
     va_end(ap);
 
-    abort();
+    ukplat_terminate(UKPLAT_CRASH);
 }
 
 #if !DISABLE_DEBUG_OUTPUT
@@ -36,7 +37,7 @@ void hexdump(const void *ptr, size_t len)
         size_t s = ROUNDUP(MIN(len - count, 16), 4);
         size_t i;
 
-        printf("0x%08"PRIxPTR": ", address);
+        printf("0x%08lx: ", address);
         for (i = 0; i < s / 4; i++) {
             u.buf[i] = ((const uint32_t *)address)[i];
             printf("%08x ", u.buf[i]);

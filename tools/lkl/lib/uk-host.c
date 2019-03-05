@@ -1,3 +1,4 @@
+#include <uk/assert.h>
 #include <uk/config.h>
 #include <uk/plat/time.h>
 #include <lk/kernel/semaphore.h>
@@ -8,20 +9,15 @@
 
 #include <stdlib.h>
 #include <sys/time.h>
-#include <assert.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <time.h>
 #include <stdint.h>
 #include <sys/types.h>
-#include <poll.h>
 #include <lkl_host.h>
 #include "iomem.h"
 #include "jmp_buf.h"
-
-/* Let's see if the host has semaphore.h */
-#include <unistd.h>
 
 static void print(const char *str, int len)
 {
@@ -46,7 +42,7 @@ struct lkl_tls_key {
 
 #define WARN_UNLESS(exp) do {						\
 		if (exp < 0)						\
-			lkl_printf("%s: %s\n", #exp, strerror(errno));	\
+			lkl_printf("%s: %d\n", #exp, errno);	        \
 	} while (0)
 
 static struct lkl_sem *lkl_sem_alloc(int count)
@@ -238,7 +234,7 @@ static void *lkl_timer_alloc(void (*fn)(void *), void *arg)
         lk_timer_t *timer = malloc(sizeof(lk_timer_t));
 
         if (!timer) {
-                lkl_printf("malloc: %s\n", strerror(errno));
+                lkl_printf("malloc: %d\n", errno);
                 return NULL;
         }
 
@@ -269,7 +265,7 @@ static void lkl_timer_free(void *_timer)
 
 static void lkl_panic(void)
 {
-	assert(0);
+	UK_ASSERT(0);
 }
 
 static long _gettid(void)
@@ -306,12 +302,13 @@ struct lkl_host_operations lkl_host_ops = {
 	.mem_free = free,
 	.ioremap = lkl_ioremap,
 	.iomem_access = lkl_iomem_access,
-	.virtio_devices = lkl_virtio_devs,
+	.virtio_devices = NULL,
 	.gettid = _gettid,
 	.jmp_buf_set = jmp_buf_set,
 	.jmp_buf_longjmp = jmp_buf_longjmp,
 };
 
+#if 0
 static int fd_get_capacity(struct lkl_disk disk, unsigned long long *res)
 {
 	off_t off;
@@ -362,23 +359,17 @@ static int blk_request(struct lkl_disk disk, struct lkl_blk_req *req)
 
 	switch (req->type) {
 	case LKL_DEV_BLK_TYPE_READ:
-#if 0
 		err = do_rw(pread, disk, req);
-#endif
 		break;
 	case LKL_DEV_BLK_TYPE_WRITE:
-#if 0
 		err = do_rw(pwrite, disk, req);
-#endif
 		break;
 	case LKL_DEV_BLK_TYPE_FLUSH:
 	case LKL_DEV_BLK_TYPE_FLUSH_OUT:
 #ifdef __linux__
 		err = fdatasync(disk.fd);
 #else
-#if 0
 		err = fsync(disk.fd);
-#endif
 #endif
 		break;
 	default:
@@ -390,9 +381,10 @@ static int blk_request(struct lkl_disk disk, struct lkl_blk_req *req)
 
 	return LKL_DEV_BLK_STATUS_OK;
 }
+#endif
 
 struct lkl_dev_blk_ops lkl_dev_blk_ops = {
-	.get_capacity = fd_get_capacity,
-	.request = blk_request,
+	.get_capacity = NULL,
+	.request = NULL,
 };
 
