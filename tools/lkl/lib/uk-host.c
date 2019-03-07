@@ -1,11 +1,14 @@
 #include <uk/assert.h>
 #include <uk/config.h>
 #include <uk/plat/time.h>
+#include <lk/err.h>
 #include <lk/kernel/semaphore.h>
 #include <lk/kernel/mutex.h>
 #include <lk/kernel/thread.h>
 #include <lk/kernel/event.h>
 #include <lk/kernel/timer.h>
+#include <lk/platform.h>
+#include <lk/platform/timer.h>
 
 #include <stdlib.h>
 #include <sys/time.h>
@@ -128,27 +131,60 @@ static void lkl_mutex_free(struct lkl_mutex *_mutex)
 	free(_mutex);
 }
 
-static volatile lk_time_t ticks = 0;
+static platform_timer_callback t_callback;
+static void *callback_arg;
+
+static uint64_t next_trigger_time;
+static uint64_t next_trigger_delta;
+
+static uint64_t timer_delta_time;
+static volatile uint64_t timer_current_time;
+
+status_t platform_set_periodic_timer(platform_timer_callback callback, void *arg, lk_time_t interval)
+{
+	t_callback = callback;
+        callback_arg = arg;
+
+        next_trigger_delta = (uint64_t)interval;
+        next_trigger_time = timer_current_time + next_trigger_delta;
+
+        return NO_ERROR;
+}
 
 static void lkl_timer_callback(void *arg __unused)
 {
-        ticks += UKPLAT_TIME_TICK_NSEC;
-        if (thread_timer_tick()==INT_RESCHEDULE)
-                thread_preempt();
+	uint64_t delta;
+
+        timer_current_time += timer_delta_time;
+
+	lk_time_t time = current_time();
+
+        if (t_callback && timer_current_time >= next_trigger_time) {
+		delta = timer_current_time - next_trigger_time;
+                next_trigger_time = timer_current_time + next_trigger_delta - delta;
+                if (t_callback(callback_arg, time) == INT_RESCHEDULE)
+			thread_preempt();
+        }
 }
 
 lk_time_t current_time(void)
 {
-        return ukplat_monotonic_clock();
+	return (lk_time_t)timer_current_time;
 }
 
 lk_bigtime_t current_time_hires(void)
 {
-        return (lk_bigtime_t)ukplat_monotonic_clock() * 1000;
+	lk_bigtime_t time;
+
+	time = (lk_bigtime_t)timer_current_time * 1000;
+
+        return time;
 }
 
 void lkl_thread_init(void)
 {
+	timer_current_time = 0;
+        timer_delta_time = UKPLAT_TIME_TICK_MSEC;
         thread_init_early();
         thread_init();
         timer_init();
@@ -229,26 +265,79 @@ static unsigned long long time_ns(void)
         return current_time()*1000000UL;
 }
 
+typedef struct {
+	lk_timer_t *timer;
+        void (*fn)(void *);
+        void *arg;
+        event_t cond;
+        thread_t *thread;
+        int request_stop;
+} timer_t;
+
+static enum handler_return lktimer_callback(struct timer *_timer, lk_time_t now, void *arg)
+{
+	timer_t *timer = arg;
+        event_signal(&timer->cond, 1);
+
+        return INT_RESCHEDULE;
+}
+
+static int timer_thread(void *arg)
+{
+	timer_t *timer = arg;
+
+        while (!timer->request_stop) {
+                event_wait(&timer->cond);
+                if (timer->request_stop)
+                      break;
+                timer->fn(timer->arg);
+        }
+
+        event_destroy(&timer->cond);
+        free(timer);
+
+        return 0;
+}
+
 static void *lkl_timer_alloc(void (*fn)(void *), void *arg)
 {
-        lk_timer_t *timer = malloc(sizeof(lk_timer_t));
+	timer_t *timer = malloc(sizeof(timer_t));
 
         if (!timer) {
                 lkl_printf("malloc: %d\n", errno);
                 return NULL;
         }
 
-        timer_initialize(timer);
+        timer->timer = malloc(sizeof(lk_timer_t));
 
-        timer->callback = fn;
+        if (!timer->timer) {
+                lkl_printf("malloc: %d\n", errno);
+                return NULL;
+        }
+
+        timer_initialize(timer->timer);
+        timer->timer->callback = lktimer_callback;
+        timer->timer->arg = timer;
+
+        timer->fn = fn;
         timer->arg = arg;
+        timer->request_stop = 0;
+        event_init(&timer->cond, 0, EVENT_FLAG_AUTOUNSIGNAL);
+
+        timer->thread = thread_create("timer", timer_thread, timer, DEFAULT_PRIORITY, 1*1024*1024);
+	if (!timer->thread) {
+                lkl_printf("malloc: %d\n", errno);
+                return NULL;
+        }
+
+        thread_detach_and_resume(timer->thread);
 
         return (void *)timer;
 }
 
 static int lkl_timer_set_oneshot(void *_timer, unsigned long ns)
 {
-        lk_timer_t *timer = _timer;
+	lk_timer_t *timer = ((timer_t *)_timer)->timer;
         lk_time_t delay = ns / 1000000;
 
         timer_set_oneshot(timer, delay, timer->callback, timer->arg);
@@ -258,9 +347,12 @@ static int lkl_timer_set_oneshot(void *_timer, unsigned long ns)
 
 static void lkl_timer_free(void *_timer)
 {
-        lk_timer_t *timer = _timer;
+	timer_t *timer = _timer;
 
-        timer_cancel(timer);
+        timer_cancel(timer->timer);
+
+        timer->request_stop = 1;
+        event_signal(&timer->cond, 1);
 }
 
 static void lkl_panic(void)
