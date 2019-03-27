@@ -272,11 +272,11 @@ typedef struct {
         event_t cond;
         thread_t *thread;
         int request_stop;
-} timer_t;
+} lkl_lk_timer_t;
 
 static enum handler_return lktimer_callback(struct timer *_timer, lk_time_t now, void *arg)
 {
-	timer_t *timer = arg;
+	lkl_lk_timer_t *timer = arg;
         event_signal(&timer->cond, 1);
 
         return INT_RESCHEDULE;
@@ -284,7 +284,7 @@ static enum handler_return lktimer_callback(struct timer *_timer, lk_time_t now,
 
 static int timer_thread(void *arg)
 {
-	timer_t *timer = arg;
+	lkl_lk_timer_t *timer = arg;
 
         while (!timer->request_stop) {
                 event_wait(&timer->cond);
@@ -301,7 +301,7 @@ static int timer_thread(void *arg)
 
 static void *lkl_timer_alloc(void (*fn)(void *), void *arg)
 {
-	timer_t *timer = malloc(sizeof(timer_t));
+	lkl_lk_timer_t *timer = malloc(sizeof(lkl_lk_timer_t));
 
         if (!timer) {
                 lkl_printf("malloc: %d\n", errno);
@@ -337,7 +337,7 @@ static void *lkl_timer_alloc(void (*fn)(void *), void *arg)
 
 static int lkl_timer_set_oneshot(void *_timer, unsigned long ns)
 {
-	lk_timer_t *timer = ((timer_t *)_timer)->timer;
+	lk_timer_t *timer = ((lkl_lk_timer_t *)_timer)->timer;
         lk_time_t delay = ns / UKPLAT_TIME_TICK_NSEC * 1000000;
 
         timer_set_oneshot(timer, delay, timer->callback, timer->arg);
@@ -347,7 +347,7 @@ static int lkl_timer_set_oneshot(void *_timer, unsigned long ns)
 
 static void lkl_timer_free(void *_timer)
 {
-	timer_t *timer = _timer;
+	lkl_lk_timer_t *timer = _timer;
 
         timer_cancel(timer->timer);
 
