@@ -338,7 +338,7 @@ static void *lkl_timer_alloc(void (*fn)(void *), void *arg)
 static int lkl_timer_set_oneshot(void *_timer, unsigned long ns)
 {
 	lk_timer_t *timer = ((lkl_lk_timer_t *)_timer)->timer;
-        lk_time_t delay = ns / UKPLAT_TIME_TICK_NSEC * 1000000;
+        lk_time_t delay = ns / UKPLAT_TIME_TICK_NSEC;
 
         timer_set_oneshot(timer, delay, timer->callback, timer->arg);
 
