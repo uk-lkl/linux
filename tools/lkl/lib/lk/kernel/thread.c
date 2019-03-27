@@ -477,7 +477,6 @@ static thread_t *get_top_thread(int cpu)
 
         local_run_queue_bitmap &= ~(1<<next_queue);
     }
-    dprintf(CRITICAL, "IDLE THREAD!!!!!!!!!!\n");
     /* no threads to run, select the idle thread for this cpu */
     return idle_thread(cpu);
 }
