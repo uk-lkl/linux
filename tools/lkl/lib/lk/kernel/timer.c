@@ -219,7 +219,7 @@ static enum handler_return timer_tick(void *arg, lk_time_t now)
     lk_timer_t *timer;
     enum handler_return ret = INT_NO_RESCHEDULE;
 
-    DEBUG_ASSERT(arch_ints_disabled());
+//    DEBUG_ASSERT(arch_ints_disabled());
 
     THREAD_STATS_INC(timer_ints);
 //  KEVLOG_TIMER_TICK(); // enable only if necessary
